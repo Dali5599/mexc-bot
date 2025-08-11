@@ -86,4 +86,3 @@ Type: filesandordirs; Name: "{app}\data"
         with:
           name: MEXC_Bot_Installer
           path: dist/installer/MEXC_Bot_Setup.exe
-
