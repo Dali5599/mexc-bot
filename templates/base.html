@@ -1,0 +1,34 @@
+
+{% set rtl = (lang == 'ar') %}
+<!DOCTYPE html>
+<html lang="{{ lang }}" class="{{ 'rtl' if rtl else '' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ t['app_title'] }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<header>
+  <div class="brand">{{ t['app_title'] }}</div>
+  <nav class="lang">
+    <span>{{ t['language'] }}:</span>
+    <a href="?lang=ar" class="{{ 'active' if lang=='ar' else '' }}">العربية</a>
+    <a href="?lang=en" class="{{ 'active' if lang=='en' else '' }}">English</a>
+    <a href="?lang=fr" class="{{ 'active' if lang=='fr' else '' }}">Français</a>
+  </nav>
+</header>
+<div class="container">
+  <div style="display:flex;gap:10px;margin-bottom:14px;">
+    <a class="badge" href="/?lang={{ lang }}">{{ t['nav_dashboard'] }}</a>
+    <a class="badge" href="/settings?lang={{ lang }}">{{ t['nav_settings'] }}</a>
+    <a class="badge" href="/backtest?lang={{ lang }}">{{ t['nav_backtest'] }}</a>
+    <a class="badge" href="/strategies?lang={{ lang }}">Strategies</a>
+    <a class="badge" href="/optimizer?lang={{ lang }}">Optimizer</a>
+    <a class="badge" href="/sql?lang={{ lang }}">SQL</a>
+  </div>
+  {% block content %}{% endblock %}
+</div>
+<footer>© {{ now.year }} — MEXC Bot</footer>
+</body>
+</html>

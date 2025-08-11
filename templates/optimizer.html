@@ -1,0 +1,91 @@
+
+{% extends "base.html" %}
+{% block content %}
+<form class="card" method="post" action="/optimizer?lang={{ lang }}">
+  <div class="grid">
+    <div>
+      <label>Strategy</label>
+      <select name="strategy_type">
+        {% for opt in ['rsi_ema','breakout','vwap','grid'] %}
+          <option value="{{ opt }}">{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label>Markets (comma separated)</label><input name="markets" placeholder="BTC/USDT, ETH/USDT" value="{{ ', '.join(cfg.markets) if cfg.markets else cfg.market }}"></div>
+    <div><label>Timeframe</label>
+      <select name="timeframe">
+        {% for tf in ['1m','5m','15m','1h'] %}
+          <option value="{{ tf }}" {% if cfg.timeframe==tf %}selected{% endif %}>{{ tf }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <p>اكتب نطاق القيم بهذا الشكل: <code>start:end:step</code> أو قيمة واحدة. أمثلة: <code>5:25:5</code> أو <code>20</code>.</p>
+  <div class="grid">
+    <div><label>p1</label><input name="p1" placeholder="ema_fast / lookback / window / step_pct"></div>
+    <div><label>p2</label><input name="p2" placeholder="ema_slow / buffer_bps / band_bps / band_mult"></div>
+    <div><label>p3</label><input name="p3" placeholder="rsi_buy (RSI EMA فقط)"></div>
+    <div><label>p4</label><input name="p4" placeholder="rsi_sell (RSI EMA فقط)"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button type="submit">Run Optimizer</button>
+  </div>
+</form>
+
+{% if results %}
+<div class="card">
+  <h3>Results (Top 20 by Ending Balance)</h3>
+  <table>
+    <thead>
+      <tr>
+        {% for k in results[0].keys() %}<th>{{ k }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in results|sort(attribute='ending_balance', reverse=True)[:20] %}
+      <tr>
+        {% for k,v in r.items() %}<td>{{ v }}</td>{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div style="margin-top:8px;"><a class="badge" href="/static/../logs/optimizer_results.csv">Download CSV</a></div>
+</div>
+{% endif %}
+{% endblock %}
+
+<div class="card">
+  <h3>Presets</h3>
+  <form method="post" action="/optimizer/save?lang={{ lang }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <input name="name" placeholder="Preset name" />
+    <input name="strategy_type" placeholder="strategy" />
+    <input name="markets" placeholder="markets" />
+    <input name="timeframe" placeholder="timeframe" />
+    <input name="p1" placeholder="p1" />
+    <input name="p2" placeholder="p2" />
+    <input name="p3" placeholder="p3" />
+    <input name="p4" placeholder="p4" />
+    <button type="submit">Save Preset</button>
+  </form>
+  <form method="get" action="/optimizer/load" style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+    <input name="name" placeholder="Preset name" />
+    <button type="submit">Load Preset</button>
+  </form>
+  {% if presets %}
+  <div style="margin-top:8px;">
+    <strong>Available:</strong>
+    {% for pr in presets %}
+      <span class="badge">{{ pr.name }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% if preset %}
+<div class="card">
+  <strong>Loaded Preset:</strong>
+  <div class="grid">
+    {% for k,v in preset.items() %}<div><label>{{ k }}</label><div class="badge">{{ v }}</div></div>{% endfor %}
+  </div>
+</div>
+{% endif %}

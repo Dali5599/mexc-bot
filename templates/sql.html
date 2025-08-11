@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3>SQLite Query (Trades)</h3>
+  <form method="post" action="/sql?lang={{ lang }}">
+    <div class="grid">
+      <div><label>Symbol</label><input name="symbol" placeholder="e.g., BTC/USDT"></div>
+      <div><label>From</label><input type="datetime-local" name="from_dt"></div>
+      <div><label>To</label><input type="datetime-local" name="to_dt"></div>
+      <div><label>Min PnL</label><input name="min_pnl" type="number" step="0.01"></div>
+      <div><label>Max PnL</label><input name="max_pnl" type="number" step="0.01"></div>
+    </div>
+    <div style="margin-top:10px;"><button type="submit">Run</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Raw SELECT (advanced)</h3>
+  <form method="post" action="/sql_raw?lang={{ lang }}">
+    <textarea name="query" style="width:100%;height:120px" placeholder="SELECT symbol, side, pnl FROM trades WHERE pnl > 0 LIMIT 20;"></textarea>
+    <div style="margin-top:10px;"><button type="submit">Run</button></div>
+    <div class="badge">Allowed: SELECT-only. Forbidden keywords: INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, ATTACH, DETACH, PRAGMA, VACUUM.</div>
+  </form>
+</div>
+
+{% if rows is not none %}
+<div class="card">
+  <h3>Results</h3>
+  <table>
+    <thead>
+      <tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>{% for h in headers %}<td>{{ r[h] }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

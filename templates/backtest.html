@@ -1,0 +1,29 @@
+
+{% extends "base.html" %}
+{% block content %}
+<form class="card" method="post" action="/backtest?lang={{ lang }}">
+  <div class="grid">
+    <div><label>{{ t['market'] }}</label><input name="market" value="{{ cfg.market }}"></div>
+    <div><label>{{ t['timeframe'] }}</label>
+      <select name="timeframe">
+        {% for tf in ['1m','5m','15m','1h'] %}
+          <option value="{{ tf }}" {% if cfg.timeframe==tf %}selected{% endif %}>{{ tf }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label>{{ t['days'] }}</label><input type="number" name="days" value="3"></div>
+  </div>
+  <div style="margin-top:12px;"><button type="submit">{{ t['run_backtest'] }}</button></div>
+</form>
+{% if result %}
+<div class="card">
+  <h3>{{ t['results'] }}</h3>
+  <table>
+    <tr><th>{{ t['ending_balance'] }}</th><td>{{ result.ending_balance }}</td></tr>
+    <tr><th>{{ t['trades'] }}</th><td>{{ result.trades }}</td></tr>
+    <tr><th>{{ t['wins'] }}</th><td>{{ result.wins }}</td></tr>
+    <tr><th>{{ t['losses'] }}</th><td>{{ result.losses }}</td></tr>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

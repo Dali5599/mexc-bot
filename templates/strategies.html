@@ -1,0 +1,26 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3>Strategies</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+    {% for opt in ['rsi_ema','breakout','vwap','grid'] %}
+      <a class="badge" href="/strategies?tab={{ opt }}&lang={{ lang }}">{{ opt }}</a>
+    {% endfor %}
+  </div>
+  {% set tab = request.query_params.get('tab') or 'rsi_ema' %}
+  {% if tab == 'rsi_ema' %}
+    <p><strong>RSI + EMA:</strong> دخول عند توافق تقاطع EMA (9/21) مع RSI منخفض، والخروج بالعكس أو عند SL/TP.</p>
+    <div style="color:#64748b">{{ sparkline_svg([1,2,3,2.5,3.5,3.2,4,3.8,4.4,4.2]) | safe }}</div>
+  {% elif tab == 'breakout' %}
+    <p><strong>Breakout:</strong> دخول عند كسر أعلى (lookback) بهامش buffer bps، والخروج عند كسر أدنى.</p>
+    <div style="color:#64748b">{{ sparkline_svg([2,2.1,2.2,2.15,2.3,2.4,2.45,2.6,2.8,3.2]) | safe }}</div>
+  {% elif tab == 'vwap' %}
+    <p><strong>VWAP:</strong> شراء تحت نطاق VWAP/بيع فوقه ضمن نافذة window.</p>
+    <div style="color:#64748b">{{ sparkline_svg([3,2.9,3.05,3.1,3.0,3.2,3.15,3.25,3.3,3.35]) | safe }}</div>
+  {% elif tab == 'grid' %}
+    <p><strong>Grid:</strong> شراء قرب الحافة السفلية حول EMA البطيء وبيع قرب العلوية بفاصل step٪.</p>
+    <div style="color:#64748b">{{ sparkline_svg([3,2.8,3.1,2.9,3.2,2.95,3.25,3.0,3.3,3.1]) | safe }}</div>
+  {% endif %}
+</div>
+{% endblock %}

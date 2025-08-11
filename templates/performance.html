@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3>Performance</h3>
+<form class="card" method="post" action="/performance">
+  <div class="grid">
+    <div>
+      <div class="badge">Daily PnL (Range)</div>
+      <img src="/static/gen/daily_range.png" alt="daily pnl range" style="max-width:100%;height:auto"/>
+    </div>
+    <div>
+      <div class="badge">Weekly PnL (Range)</div>
+      <img src="/static/gen/weekly_range.png" alt="weekly pnl range" style="max-width:100%;height:auto"/>
+    </div>
+    <div><label>Start Date</label><input type="date" name="start_date"></div>
+    <div><label>End Date</label><input type="date" name="end_date"></div>
+    <div><label>Week</label><input type="text" placeholder="YYYY-Www" name="week"></div>
+  </div>
+  <div style="margin-top:10px;"><button type="submit">Apply</button></div>
+</form>
+  <div class="grid">
+    <div>
+      <div class="badge">Daily PnL (Range)</div>
+      <img src="/static/gen/daily_range.png" alt="daily pnl range" style="max-width:100%;height:auto"/>
+    </div>
+    <div>
+      <div class="badge">Weekly PnL (Range)</div>
+      <img src="/static/gen/weekly_range.png" alt="weekly pnl range" style="max-width:100%;height:auto"/>
+    </div>
+    <div>
+      <div class="badge">Equity Curve</div>
+      <img src="/static/gen/equity.png" alt="equity curve" style="max-width:100%;height:auto"/>
+    </div>
+    <div>
+      <div class="badge">Daily PnL</div>
+      <img src="/static/gen/daily.png" alt="daily pnl" style="max-width:100%;height:auto"/>
+    </div>
+    <div>
+      <div class="badge">Weekly PnL</div>
+      <img src="/static/gen/weekly.png" alt="weekly pnl" style="max-width:100%;height:auto"/>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <h3>Equity (Range)</h3>
+  <img src="/static/gen/equity_range.png" alt="equity range" style="max-width:100%;height:auto"/>
+</div>
+<div class="card">
+  <h3>Per-Symbol Summary</h3>
+  <table>
+    <thead><tr><th>Symbol</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Winrate %</th><th>Avg PnL</th><th>Total PnL</th></tr></thead>
+    <tbody>
+      {% for sym, st in stats_sym.items() %}
+      <tr>
+        <td>{{ sym }}</td>
+        <td>{{ st.trades }}</td>
+        <td>{{ st.wins }}</td>
+        <td>{{ st.losses }}</td>
+        <td>{{ '%.1f'|format(st.winrate) }}</td>
+        <td class="{{ 'gain' if st.avg_pnl >= 0 else 'loss' }}">{{ '%.2f'|format(st.avg_pnl) }}</td>
+        <td class="{{ 'gain' if st.pnl >= 0 else 'loss' }}">{{ '%.2f'|format(st.pnl) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+  <div><strong>Weekly Report (PDF)</strong></div>
+  <div><a class="badge" href="/weekly_report">Download</a></div>
+</div>

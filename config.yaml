@@ -1,0 +1,73 @@
+# إعدادات عامة
+market: BTC/USDT
+markets:
+  - BTC/USDT
+  - ETH/USDT
+  - SOL/USDT
+timeframe: 1m         # 1m, 5m, 15m, 1h...
+max_spread_bps: 15    # أقصى سبريد مسموح به (basis points = 0.01%)
+fee_bps: 10           # عمولة تقديرية إجمالية ذهاباً وإياباً
+
+# إدارة المخاطر
+risk:
+  risk_per_trade_pct: 0.5      # نسبة من الرصيد لكل صفقة
+  max_concurrent_positions: 1
+  stop_loss_pct: 0.6           # 0.6%
+  take_profit_pct: 1.2
+  time_stop_minutes: 240        # إغلاق زمني للمركز بعد هذا العدد من الدقائق (0 لإيقافه)          # 1.2%
+
+# الاستراتيجية (RSI + EMA)
+strategy:
+  type: rsi_ema   # rsi_ema | breakout | vwap | grid
+  rsi_period: 14
+  rsi_buy: 32
+  rsi_sell: 68
+  ema_fast: 9
+  ema_slow: 21
+
+# تخزين السجلات
+logs_dir: logs
+data_dir: data
+
+
+# سحب الأرباح الجزئي (Profit Skim)
+skim:
+  enabled: true
+  step_pct: 0.8         # كل ارتفاع +0.8% فوق آخر مستوى سكيم
+  fraction_pct: 20.0     # بيع 20% من الكمية عند كل مستوى
+      trailing: true
+      max_steps: 5
+
+# حدود الحماية
+limits:
+  max_trades_per_day: 10    # أقصى عدد دخول يوميًا
+  daily_max_loss_usdt: 50   # أقصى خسارة يومية مُحقَّقة بالدولار
+
+
+    dca:
+      enabled: true
+      add_steps: 2            # كم مرة يسمح بالتعزيز
+      add_pct_drop: 0.7       # كل هبوط بالنسبة المئوية من آخر تعزيز/دخول
+      add_fraction_pct: 25.0  # نسبة من الكمية الحالية للتعزيز في كل خطوة
+
+
+    liquidity:
+      min_24h_volume_usdt: 1000000   # أقل حجم يومي مقبول
+      min_orderbook_depth_usdt: 5000 # عمق مجموعي للـ bid/ask (تبسيطي)
+
+
+breakout:
+  lookback: 50        # كسر أعلى/أدنى خلال N شموع
+  buffer_bps: 10      # هامش 0.10% لتفادي الاختراقات الكاذبة
+
+vwap:
+  window: 30          # عدد الشموع لحساب VWAP المتحرك
+  band_bps: 20        # نطاق حول VWAP للدخول/الخروج
+
+grid:
+  step_pct: 0.6       # الفاصل بين مستويات الشبكة (%)
+  band_mult: 1.0      # مضاعف حول EMA البطيء لتحديد المركز
+
+
+logging:
+  sqlite: true   # فعّل التسجيل في SQLite إلى جانب CSV

@@ -1,0 +1,139 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="grid">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div><strong>{{ t['bot_status'] }}:</strong> <span class="status">{{ t['running'] if status=='running' else t['stopped'] }}</span></div>
+      <div style="display:flex;gap:8px;">
+        {% if status == 'running' %}
+        <form method="post" action="/stop?lang={{ lang }}"><button type="submit" class="secondary">{{ t['stop_bot'] }}</button></form>
+        {% else %}
+        <form method="post" action="/start?lang={{ lang }}"><button type="submit">{{ t['start_bot'] }}</button></form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label>{{ t['market'] }}</label>
+        <div class="badge">{{ cfg.market }}</div>
+      </div>
+      <div>
+        <label>{{ t['timeframe'] }}</label>
+        <div class="badge">{{ cfg.timeframe }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="grid">
+    <div>
+      <label>{{ t['balance'] }} ({{ t['usdt'] }})</label>
+      <div class="badge">{{ balance }}</div>
+    </div>
+    <div>
+      <label>{{ t['live_trading'] }}</label>
+      <div class="badge">{{ t['running'] if live else t['simulate'] }}</div>
+    </div>
+  </div>
+
+<div class="card">
+  <h3>Markets Overview</h3>
+  <div class="grid-3">
+    {% for s in spark_overview %}
+    <div class="card" style="padding:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong>{{ s.symbol }}</strong>
+        <span class="badge">{{ s.last }}</span>
+      </div>
+      <div style="margin-top:6px; color:#64748b;">{{ s.svg | safe }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<form class="card" method="get" action="/">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <div><label>Filter</label></div>
+    <div>
+      <select name="sym">
+        <option value="">All</option>
+        {% for s in all_symbols %}
+          <option value="{{ s }}" {% if sym_filter==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <input type="hidden" name="lang" value="{{ lang }}" />
+    <button type="submit">Apply</button>
+  </div>
+</form>
+
+</div>
+{% endblock %}
+
+<div class="card">
+  <h3>{{ t['nav_dashboard'] }}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th><th>Side</th><th>Entry Time</th><th>Entry</th><th>Exit Time</th><th>Exit</th><th>PNL (USDT)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tr in trades|reverse %}
+      <tr>
+        <td>{{ tr.symbol }}</td>
+        <td>{{ tr.side }}</td>
+        <td>{{ tr.entry_time.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ '%.4f'|format(tr.entry_price) }}</td>
+        <td>{{ tr.exit_time.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ '%.4f'|format(tr.exit_price) }}</td>
+        <td class="{{ 'gain' if tr.pnl >= 0 else 'loss' }}">{{ '%.2f'|format(tr.pnl) }}</td>
+      </tr>
+      {% for sym, pos in open_positions.items() %}{% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+<div class="card">
+  <h3>Open Positions</h3>
+  <table>
+    <thead><tr><th>Symbol</th><th>Qty</th><th>Entry</th><th>Last</th><th>uPnL</th><th>Entry Time</th><th>Action</th><th>Partial</th></tr></thead>
+    <tbody>
+      {% for sym, pos in open_positions.items() %}
+      <tr>
+        <td>{{ pos.symbol }}</td>
+        <td>{{ '%.6f'|format(pos.qty) }}</td>
+        <td>{{ '%.4f'|format(unrealized.get(pos.symbol, {}).get('price', pos.entry_price)) }}</td>
+        {% set u = unrealized.get(pos.symbol, {}).get('uPnL', 0.0) %}
+        <td class="{{ 'gain' if u >= 0 else 'loss' }}">{{ '%.2f'|format(u) }}</td>
+        <td>{{ pos.entry_time.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          <form method="post" action="/close?lang={{ lang }}">
+            <input type="hidden" name="symbol" value="{{ pos.symbol }}" />
+            <button type="submit" class="secondary">Close</button>
+          </form>
+        </td>
+        <td>
+          <form method="post" action="/close_partial?lang={{ lang }}" style="display:flex;gap:6px;align-items:center;">
+            <input type="hidden" name="symbol" value="{{ pos.symbol }}" />
+            <input name="percent" type="number" min="1" max="99" step="1" value="20" style="width:80px" />
+            <button type="submit">Close %</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+  <div><strong>Trades CSV</strong></div>
+  <div><a class="badge" href="/export_trades">Download</a></div>
+</div>
