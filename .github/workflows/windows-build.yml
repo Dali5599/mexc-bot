@@ -1,3 +1,7 @@
+git add .github\workflows\windows-build.yml
+git commit -m "add windows build workflow"
+git push -u origin main
+
 name: Build Windows EXE
 
 on:
