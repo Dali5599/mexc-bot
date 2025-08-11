@@ -20,10 +20,8 @@ def start_server():
 def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"), override=False)
-    # إنشاء .env تلقائيًا إن لم يوجد
     if not os.path.exists(".env") and os.path.exists(".env.example"):
         import shutil; shutil.copyfile(".env.example", ".env")
-
     try:
         t = threading.Thread(target=start_server, daemon=True)
         t.start()
